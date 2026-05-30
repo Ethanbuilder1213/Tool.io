@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>The Tool Shed</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+  <!-- Sleek Modern Theme -->
+  <style>
+    * { box-sizing: border-box; font-family: "Inter", Arial, sans-serif; }
+
+    body {
+      margin: 0;
+      background: #f7f9fc;
+      color: #1f2937;
+    }
+
+    header {
+      background: #111827;
+      color: #fff;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    nav a {
+      color: #e5e7eb;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    nav a:hover { color: #fff; }
+
+    main {
+      padding: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section {
+      background: #ffffff;
+      padding: 24px;
+      margin-bottom: 28px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: #3b82f6;
+      background: #fff;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      background: #3b82f6;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    button:hover { background: #2563eb; }
+
+    .tools-list, .rentals-list {
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid #e5e7eb;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f9fafb;
+    }
+
+    .tool-item, .rental-item {
+      padding: 10px 6px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .tool-item:last-child,
+    .rental-item:last-child {
+      border-bottom: none;
+    }
+
+    .tool-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #e5e7eb;
+      flex-shrink: 0;
+    }
+
+    .tool-body {
+      flex: 1;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      background: #e5e7eb;
+      margin-left: 6px;
+    }
+
+    .hidden { display: none; }
+
+    .admin-warning {
+      font-size: 13px;
+      color: #dc2626;
+      margin-top: 6px;
+    }
+
+    .barcode-container svg {
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1e40af;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    .flex { display: flex; gap: 20px; flex-wrap: wrap; }
+    .half { flex: 1 1 300px; }
+
+    .dashboard {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .dash-card {
+      flex: 1 1 160px;
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .dash-label {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .dash-value {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-row input,
+    .filter-row select {
+      flex: 1 1 160px;
+    }
+
+    .card {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      padding: 16px;
+      background: #f9fafb;
+      margin-top: 12px;
+    }
+
+    .card h4 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+
+    .print-btn {
+      background: #10b981;
+    }
+
+    .print-btn:hover {
+      background: #059669;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printCardArea, #printCardArea * { visibility: visible; }
+      #printCardArea { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>The Tool Shed</h1>
+  <nav>
+    <a onclick="showSection('home')">Home</a>
+    <a onclick="showSection('member')">Member Area</a>
+    <a onclick="showSection('adminLogin')">Admin</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section id="homeSection" class="section">
+    <h2>Welcome to The Tool Shed</h2>
+    <p>Browse our tools and check rental prices.</p>
+
+    <h3>Tool Listings</h3>
+
+    <div class="filter-row">
+      <input id="toolSearchInput" placeholder="Search tools by name or description" oninput="refreshPublicTools()" />
+      <select id="toolCategoryFilter" onchange="refreshPublicTools()">
+        <option value="">All categories</option>
+        <option value="Power Tools">Power Tools</option>
+        <option value="Hand Tools">Hand Tools</option>
+        <option value="Yard Equipment">Yard Equipment</option>
+        <option value="Ladders">Ladders</option>
+        <option value="Plumbing">Plumbing</option>
+        <option value="Electrical">Electrical</option>
+        <option value="Other">Other</option>
+      </select>
+      <select id="availabilityFilter" onchange="refreshPublicTools()">
+        <option value="">All availability</option>
+        <option value="available">Only available</option>
+        <option value="unavailable">Only unavailable</option>
+      </select>
+    </div>
+
+    <div class="tools-list" id="publicToolsList"></div>
+  </section>
+
+  <!-- MEMBER AREA -->
+  <section id="memberSection" class="section hidden">
+    <h2>Member Area</h2>
+    <label>Enter your barcode number</label>
+    <input id="memberBarcodeInput" />
+    <button onclick="lookupMemberByBarcode()">View Rentals</button>
+    <div id="memberLookupError" class="admin-warning"></div>
+
+    <h3>Your Info</h3>
+    <div id="memberInfoDisplay" class="small"></div>
+
+    <h3>Your Rentals</h3>
+    <div id="memberRentalsList" class="rentals-list"></div>
+
+    <h3>Check Out a Tool</h3>
+    <div id="memberCheckoutTools" class="tools-list"></div>
+  </section>
+
+  <!-- ADMIN LOGIN -->
+  <section id="adminLoginSection" class="section hidden">
+    <h2>Admin Login</h2>
+    <label>Password</label>
+    <input id="adminPassword" type="password" />
+    <button onclick="adminLogin()">Login</button>
+    <div id="adminLoginError" class="admin-warning"></div>
+  </section>
+
+  <!-- ADMIN PANEL -->
+  <section id="adminPanelSection" class="section hidden">
+    <h2>Admin Panel</h2>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard">
+      <div class="dash-card">
+        <div class="dash-label">Total Customers</div>
+        <div class="dash-value" id="dashTotalCustomers">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Total Tools</div>
+        <div class="dash-value" id="dashTotalTools">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Active Rentals</div>
+        <div class="dash-value" id="dashActiveRentals">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Total Inventory</div>
+        <div class="dash-value" id="dashTotalInventory">0</div>
+      </div>
+    </div>
+
+    <div class="flex">
+
+      <!-- CUSTOMER CREATION -->
+      <div class="half">
+        <h3>Create Customer</h3>
+        <label>Name</label><input id="custName" />
+        <label>Email</label><input id="custEmail" />
+        <label>Phone</label><input id="custPhone" />
+        <label>Credit Info (demo only)</label><input id="custCredit" />
+        <label>Notes</label><textarea id="custNotes"></textarea>
+        <button onclick="createCustomer()">Create & Generate Barcode</button>
+        <div id="custCreateMsg" class="small"></div>
+
+        <div id="barcodeWrapper" class="barcode-container hidden">
+          <h4>Membership Barcode</h4>
+          <svg id="barcode"></svg>
+
+          <div class="card" id="printCardArea">
+            <h4>The Tool Shed Membership Card</h4>
+            <div id="cardName" class="small"></div>
+            <div id="cardEmail" class="small"></div>
+            <div id="cardBarcodeText" class="small"></div>
+            <div style="margin-top:8px;">
+              <svg id="cardBarcodeSvg"></svg>
+            </div>
+          </div>
+
+          <button class="print-btn" onclick="window.print()">Print Membership Card</button>
+        </div>
+
+        <h3>Search Customer</h3>
+        <input id="searchCustomerInput" placeholder="Name, email, phone, barcode" />
+        <button onclick="searchCustomer()">Search</button>
+        <div id="searchCustomerResult" class="small"></div>
+      </div>
+
+      <!-- TOOLS -->
+      <div class="half">
+        <h3>Add Tool</h3>
+        <label>Name</label><input id="toolName" />
+        <label>Description</label><textarea id="toolDesc"></textarea>
+        <label>Category</label>
+        <select id="toolCategory">
+          <option value="Power Tools">Power Tools</option>
+          <option value="Hand Tools">Hand Tools</option>
+          <option value="Yard Equipment">Yard Equipment</option>
+          <option value="Ladders">Ladders</option>
+          <option value="Plumbing">Plumbing</option>
+          <option value="Electrical">Electrical</option>
+          <option value="Other">Other</option>
+        </select>
+        <label>Image URL</label><input id="toolImage" placeholder="https://example.com/image.jpg" />
+        <label>Cost per day</label><input id="toolCost" type="number" />
+        <label>Quantity in stock</label><input id="toolQuantity" type="number" min="1" value="1" />
+        <label>Max rental days</label><input id="toolMaxDays" type="number" min="1" value="3" />
+        <button onclick="addTool()">Add Tool</button>
+        <div id="toolAddMsg" class="small"></div>
+
+        <h3>Tools</h3>
+        <div id="adminToolsList" class="tools-list"></div>
+
+        <h3>Create Rental (Admin)</h3>
+        <label>Customer Barcode</label><input id="rentalCustBarcode" />
+        <label>Tool ID</label><input id="rentalToolId" />
+        <label>Start</label><input id="rentalStart" type="date" />
+        <label>End</label><input id="rentalEnd" type="date" />
+        <button onclick="createRental()">Add Rental</button>
+        <div id="rentalMsg" class="small"></div>
+      </div>
+    </div>
+
+    <div class="flex" style="margin-top:20px;">
+      <div class="half">
+        <h3>All Rentals</h3>
+        <div id="adminRentalsList" class="rentals-list"></div>
+      </div>
+    </div>
+
+    <button style="background:#b00020;margin-top:20px;" onclick="adminLogout()">Log Out</button>
+  </section>
+
+</main>
+
+<script>
+  const LS = {
+    CUSTOMERS: 'ts_customers',
+    TOOLS: 'ts_tools',
+    RENTALS: 'ts_rentals'
+  };
+
+  const ADMIN_PASSWORD = "2468!?!";
+
+  function safeLoad(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function save(key, val) {
+    localStorage.setItem(key, JSON.stringify(val));
+  }
+
+  function showSection(id) {
+    const sections = {
+      home: "homeSection",
+      member: "memberSection",
+      adminLogin: "adminLoginSection",
+      adminPanel: "adminPanelSection"
+    };
+
+    Object.values(sections).forEach(sec => {
+      document.getElementById(sec).classList.add("hidden");
+    });
+
+    document.getElementById(sections[id]).classList.remove("hidden");
+  }
+
+  function adminLogin() {
+    const pw = document.getElementById("adminPassword").value;
+    const err = document.getElementById("adminLoginError");
+    err.textContent = "";
+
+    if (pw === ADMIN_PASSWORD) {
+      showSection("adminPanel");
+      refreshAdmin();
+    } else {
+      err.textContent = "Wrong password";
+    }
+  }
+
+  function adminLogout() {
+    showSection("home");
+  }
+
+  function generateBarcode() {
+    return "TS" + Date.now().toString(36) + Math.floor(Math.random() * 999);
+  }
+
+  function createCustomer() {
+    const name = document.getElementById("custName").value.trim();
+    const email = document.getElementById("custEmail").value.trim();
+    const phone = document.getElementById("custPhone").value.trim();
+    const credit = document.getElementById("custCredit").value.trim();
+    const notes = document.getElementById("custNotes").value.trim();
+    const msg = document.getElementById("custCreateMsg");
+    const barcodeWrapper = document.getElementById("barcodeWrapper");
+
+    if (!name || !email) {
+      msg.textContent = "Name & email required";
+      return;
+    }
+
+    const customers = safeLoad(LS.CUSTOMERS);
+    const barcode = generateBarcode();
+
+    const newCustomer = {
+      id: "C" + (customers.length + 1),
+      name,
+      email,
+      phone,
+      credit,
+      notes,
+      barcode
+    };
+
+    customers.push(newCustomer);
+    save(LS.CUSTOMERS, customers);
+
+    JsBarcode("#barcode", barcode, { format: "CODE128" });
+    JsBarcode("#cardBarcodeSvg", barcode, { format: "CODE128", width: 2, height: 40 });
+
+    document.getElementById("cardName").textContent = "Name: " + newCustomer.name;
+    document.getElementById("cardEmail").textContent = "Email: " + newCustomer.email;
+    document.getElementById("cardBarcodeText").textContent = "Barcode: " + newCustomer.barcode;
+
+    barcodeWrapper.classList.remove("hidden");
+    msg.textContent = "Customer created with barcode: " + barcode;
+
+    document.getElementById("custName").value = "";
+    document.getElementById("custEmail").value = "";
+    document.getElementById("custPhone").value = "";
+    document.getElementById("custCredit").value = "";
+    document.getElementById("custNotes").value = "";
+
+    refreshAdmin();
+  }
+
+  function searchCustomer() {
+    const q = document.getElementById("searchCustomerInput").value.toLowerCase();
+    const out = document.getElementById("searchCustomerResult");
+    const customers = safeLoad(LS.CUSTOMERS);
+
+    const found = customers.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.email.toLowerCase().includes(q) ||
+      (c.phone || "").toLowerCase().includes(q) ||
+      c.barcode.toLowerCase().includes(q)
+    );
+
+    if (!found.length) {
+      out.textContent = "No customers found";
+      return;
+    }
+
+    out.innerHTML = found.map(c => `
+      <div>
+        <strong>${c.name}</strong>
+        <span class="pill">${c.barcode}</span><br>
+        ${c.email} | ${c.phone || ""}
+      </div>
+    `).join("<hr>");
+  }
+
+  function addTool() {
+    const name = document.getElementById("toolName").value.trim();
+    const desc = document.getElementById("toolDesc").value.trim();
+    const category = document.getElementById("toolCategory").value;
+    const image = document.getElementById("toolImage").value.trim();
+    const cost = parseFloat(document.getElementById("toolCost").value);
+    const quantity = parseInt(document.getElementById("toolQuantity").value, 10) || 0;
+    const maxDays = parseInt(document.getElementById("toolMaxDays").value, 10) || 0;
+    const msg = document.getElementById("toolAddMsg");
+
+    if (!name || isNaN(cost) || quantity <= 0 || maxDays <= 0) {
+      msg.textContent = "Name, cost, quantity & max days required";
+      return;
+    }
+
+    const tools = safeLoad(LS.TOOLS);
+    tools.push({
+      id: "T" + (tools.length + 1),
+      name,
+      desc,
+      category,
+      image,
+      cost,
+      quantity,
+      maxDays
+    });
+
+    save(LS.TOOLS, tools);
+
+    msg.textContent = "Tool added";
+    document.getElementById("toolName").value = "";
+    document.getElementById("toolDesc").value = "";
+    document.getElementById("toolImage").value = "";
+    document.getElementById("toolCost").value = "";
+    document.getElementById("toolQuantity").value = "1";
+    document.getElementById("toolMaxDays").value = "3";
+
+    refreshAdmin();
+    refreshPublicTools();
+  }
+
+  function daysBetween(startStr, endStr) {
+    const s = new Date(startStr);
+    const e = new Date(endStr);
+    if (isNaN(s) || isNaN(e)) return NaN;
+    const diff = e.getTime() - s.getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1; // inclusive
+  }
+
+  function createRental() {
+    const barcode = document.getElementById("rentalCustBarcode").value.trim();
+    const toolId = document.getElementById("rentalToolId").value.trim();
+    const start = document.getElementById("rentalStart").value;
+    const end = document.getElementById("rentalEnd").value;
+    const msg = document.getElementById("rentalMsg");
+
+    const customers = safeLoad(LS.CUSTOMERS);
+    const tools = safeLoad(LS.TOOLS);
+    const rentals = safeLoad(LS.RENTALS);
+
+    const customer = customers.find(c => c.barcode === barcode);
+    if (!customer) {
+      msg.textContent = "Customer not found";
+      return;
+    }
+
+    const tool = tools.find(t => t.id === toolId);
+    if (!tool) {
+      msg.textContent = "Tool not found";
+      return;
+    }
+
+    if (!start || !end) {
+      msg.textContent = "Start and end dates required";
+      return;
+    }
+
+    const diffDays = daysBetween(start, end);
+    if (isNaN(diffDays) || diffDays <= 0) {
+      msg.textContent = "Invalid date range";
+      return;
+    }
+
+    if (tool.maxDays && diffDays > tool.maxDays) {
+      msg.textContent = `Max rental for this tool is ${tool.maxDays} days`;
+      return;
+    }
+
+    const rented = rentals.filter(r => r.toolId === toolId && r.active).length;
+    const available = tool.quantity - rented;
+
+    if (available <= 0) {
+      msg.textContent = "This tool is fully rented out";
+      return;
+    }
+
+    rentals.push({
+      id: "R" + (rentals.length + 1),
+      customerBarcode: barcode,
+      toolId,
+      start,
+      end,
+      active: true
+    });
+
+    save(LS.RENTALS, rentals);
+
+    msg.textContent = "Rental created";
+
+    document.getElementById("rentalCustBarcode").value = "";
+    document.getElementById("rentalToolId").value = "";
+    document.getElementById("rentalStart").value = "";
+    document.getElementById("rentalEnd").value = "";
+
+    refreshAdmin();
+    refreshPublicTools();
+  }
+
+  function extendRental(rentalId, days) {
+    const rentals = safeLoad(LS.RENTALS);
+    const tools = safeLoad(LS.TOOLS);
+    const rental = rentals.find(r => r.id === rentalId);
+    if (!rental) return;
+
+    const tool = tools.find(t => t.id === rental.toolId);
+    if (!tool) return;
+
+    if (!rental.end) return;
+
+    const oldDiff = daysBetween(rental.start, rental.end);
+    const newEndDate = new Date(rental.end);
+    newEndDate.setDate(newEndDate.getDate() + days);
+    const newEndStr = newEndDate.toISOString().slice(0, 10);
+    const newDiff = daysBetween(rental.start, newEndStr);
+
+    if (tool.maxDays && newDiff > tool.maxDays) {
+      alert(`Cannot extend beyond max of ${tool.maxDays} days for this tool.`);
+      return;
+    }
+
+    rental.end = newEndStr;
+
+    save(LS.RENTALS, rentals);
+    refreshAdmin();
+    const barcode = document.getElementById("memberBarcodeInput").value.trim();
+    if (barcode) {
+      lookupMemberByBarcode(false);
+    }
+  }
+
+  function lookupMemberByBarcode(showErrors = true) {
+    const barcode = document.getElementById("memberBarcodeInput").value.trim();
+    const err = document.getElementById("memberLookupError");
+    const info = document.getElementById("memberInfoDisplay");
+    const list = document.getElementById("memberRentalsList");
+
+    if (showErrors) {
+      err.textContent = "";
+    }
+    info.textContent = "";
+    list.innerHTML = "";
+
+    const customers = safeLoad(LS.CUSTOMERS);
+    const customer = customers.find(c => c.barcode === barcode);
+
+    if (!customer) {
+      if (showErrors) err.textContent = "No member found";
+      return;
+    }
+
+    info.innerHTML = `
+      <strong>${customer.name}</strong><br>
+      ${customer.email}<br>
+      ${customer.phone || ""}<br>
+      Barcode: ${customer.barcode}
+    `;
+
+    const rentals = safeLoad(LS.RENTALS).filter(r => r.customerBarcode === barcode);
+    renderRentals(list, rentals, true);
+    renderMemberCheckoutTools(safeLoad(LS.TOOLS), barcode);
+  }
+
+  function renderTools(el, tools, showId) {
+    const rentals = safeLoad(LS.RENTALS);
+
+    if (!tools.length) {
+      el.innerHTML = '<div class="small">No tools yet.</div>';
+      return;
+    }
+
+    el.innerHTML = tools.map(t => {
+      const rented = rentals.filter(r => r.toolId === t.id && r.active).length;
+      const available = t.quantity - rented;
+
+      const availabilityText = available > 0 
+        ? `<span style="color:#16a34a;font-weight:600;">Available: ${available}/${t.quantity}</span>`
+        : `<span style="color:#dc2626;font-weight:600;">In Use / Out of Stock (${t.quantity})</span>`;
+
+      const img = t.image
+        ? `<img class="tool-thumb" src="${t.image}" alt="${t.name}" onerror="this.style.display='none';" />`
+        : `<div class="tool-thumb"></div>`;
+
+      return `
+        <div class="tool-item">
+          ${img}
+          <div class="tool-body">
+            <strong>${t.name}</strong>
+            ${showId ? `<span class="badge">${t.id}</span>` : ""}
+            <span class="pill">${t.category || "Uncategorized"}</span>
+
+            <div class="small"><strong>Tool ID:</strong> ${t.id}</div>
+            <div>${t.desc || ""}</div>
+            <div class="small">$${t.cost}/day</div>
+            <div class="small">Max rental: ${t.maxDays || "?"} days</div>
+            <div class="small">${availabilityText}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderRentals(el, rentals, allowExtend = false) {
+    if (!rentals.length) {
+      el.innerHTML = '<div class="small">No rentals yet.</div>';
+      return;
+    }
+
+    const tools = safeLoad(LS.TOOLS);
+    const customers = safeLoad(LS.CUSTOMERS);
+
+    el.innerHTML = rentals.map(r => {
+      const tool = tools.find(t => t.id === r.toolId);
+      const cust = customers.find(c => c.barcode === r.customerBarcode);
+      const activeText = r.active ? "Active" : "Closed";
+
+      return `
+        <div class="rental-item">
+          <div class="tool-body">
+            <strong>${tool ? tool.name : "Unknown Tool"}</strong>
+            <span class="badge">${activeText}</span>
+            <div class="small">Customer: ${cust ? cust.name : "Unknown"}</div>
+            <div class="small">${r.start} → ${r.end}</div>
+            ${allowExtend && r.active ? `
+              <button style="margin-top:6px;padding:4px 10px;font-size:12px;" onclick="extendRental('${r.id}', 3)">Extend 3 days</button>
+            ` : ""}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderMemberCheckoutTools(tools, memberBarcode) {
+    const el = document.getElementById("memberCheckoutTools");
+    const rentals = safeLoad(LS.RENTALS);
+
+    if (!tools.length) {
+      el.innerHTML = '<div class="small">No tools available.</div>';
+      return;
+    }
+
+    el.innerHTML = tools.map(t => {
+      const rented = rentals.filter(r => r.toolId === t.id && r.active).length;
+      const available = t.quantity - rented;
+
+      const img = t.image 
+        ? `<img class="tool-thumb" src="${t.image}" onerror="this.style.display='none';">`
+        : `<div class="tool-thumb"></div>`;
+
+      const availabilityText = available > 0
+        ? `<span style="color:#16a34a;font-weight:600;">Available: ${available}/${t.quantity}</span>`
+        : `<span style="color:#dc2626;font-weight:600;">In Use / Out of Stock</span>`;
+
+      const startId = `memberStart-${t.id}`;
+      const endId = `memberEnd-${t.id}`;
+
+      return `
+        <div class="tool-item">
+          ${img}
+          <div class="tool-body">
+            <strong>${t.name}</strong>
+            <span class="pill">${t.category}</span>
+            <div class="small"><strong>Tool ID:</strong> ${t.id}</div>
+            <div>${t.desc || ""}</div>
+            <div class="small">$${t.cost}/day</div>
+            <div class="small">Max rental: ${t.maxDays || "?"} days</div>
+            <div class="small">${availabilityText}</div>
+
+            <div class="small" style="margin-top:6px;">
+              <label class="small">Start date</label>
+              <input type="date" id="${startId}">
+              <label class="small">End date</label>
+              <input type="date" id="${endId}">
+            </div>
+
+            ${available > 0 ? `
+              <button style="margin-top:6px;" onclick="memberCheckoutTool('${memberBarcode}', '${t.id}')">
+                Check Out
+              </button>
+            ` : ""}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function memberCheckoutTool(barcode, toolId) {
+    const tools = safeLoad(LS.TOOLS);
+    const rentals = safeLoad(LS.RENTALS);
+    const customers = safeLoad(LS.CUSTOMERS);
+
+    const customer = customers.find(c => c.barcode === barcode);
+    if (!customer) {
+      alert("Member not found.");
+      return;
+    }
+
+    const tool = tools.find(t => t.id === toolId);
+    if (!tool) {
+      alert("Tool not found.");
+      return;
+    }
+
+    const startEl = document.getElementById(`memberStart-${toolId}`);
+    const endEl = document.getElementById(`memberEnd-${toolId}`);
+    const start = startEl.value;
+    const end = endEl.value;
+
+    if (!start || !end) {
+      alert("Please select start and end dates.");
+      return;
+    }
+
+    const diffDays = daysBetween(start, end);
+    if (isNaN(diffDays) || diffDays <= 0) {
+      alert("Invalid date range.");
+      return;
+    }
+
+    if (tool.maxDays && diffDays > tool.maxDays) {
+      alert(`Max rental for this tool is ${tool.maxDays} days.`);
+      return;
+    }
+
+    const rented = rentals.filter(r => r.toolId === toolId && r.active).length;
+    const available = tool.quantity - rented;
+
+    if (available <= 0) {
+      alert("This tool is fully rented out.");
+      return;
+    }
+
+    rentals.push({
+      id: "R" + (rentals.length + 1),
+      customerBarcode: barcode,
+      toolId,
+      start,
+      end,
+      active: true
+    });
+
+    save(LS.RENTALS, rentals);
+
+    alert("Tool checked out successfully!");
+
+    lookupMemberByBarcode(false);
+    refreshPublicTools();
+    refreshAdmin();
+  }
+
+  function refreshDashboard() {
+    const customers = safeLoad(LS.CUSTOMERS);
+    const tools = safeLoad(LS.TOOLS);
+    const rentals = safeLoad(LS.RENTALS);
+
+    const totalCustomers = customers.length;
+    const totalTools = tools.length;
+    const activeRentals = rentals.filter(r => r.active).length;
+    const totalInventory = tools.reduce((sum, t) => sum + (t.quantity || 0), 0);
+
+    document.getElementById("dashTotalCustomers").textContent = totalCustomers;
+    document.getElementById("dashTotalTools").textContent = totalTools;
+    document.getElementById("dashActiveRentals").textContent = activeRentals;
+    document.getElementById("dashTotalInventory").textContent = totalInventory;
+  }
+
+  function refreshAdmin() {
+    const adminToolsList = document.getElementById("adminToolsList");
+    const adminRentalsList = document.getElementById("adminRentalsList");
+    renderTools(adminToolsList, safeLoad(LS.TOOLS), true);
+    renderRentals(adminRentalsList, safeLoad(LS.RENTALS), true);
+    refreshDashboard();
+  }
+
+  function refreshPublicTools() {
+    const publicToolsList = document.getElementById("publicToolsList");
+    const tools = safeLoad(LS.TOOLS);
+
+    const search = document.getElementById("toolSearchInput").value.toLowerCase();
+    const categoryFilter = document.getElementById("toolCategoryFilter").value;
+    const availabilityFilter = document.getElementById("availabilityFilter").value;
+    const rentals = safeLoad(LS.RENTALS);
+
+    const filtered = tools.filter(t => {
+      const matchesSearch =
+        t.name.toLowerCase().includes(search) ||
+        (t.desc || "").toLowerCase().includes(search);
+
+      const matchesCategory =
+        !categoryFilter || t.category === categoryFilter;
+
+      const rented = rentals.filter(r => r.toolId === t.id && r.active).length;
+      const available = t.quantity - rented;
+
+      let matchesAvailability = true;
+      if (availabilityFilter === "available") {
+        matchesAvailability = available > 0;
+      } else if (availabilityFilter === "unavailable") {
+        matchesAvailability = available <= 0;
+      }
+
+      return matchesSearch && matchesCategory && matchesAvailability;
+    });
+
+    renderTools(publicToolsList, filtered, false);
+  }
+
+  window.onload = function () {
+    refreshPublicTools();
+  };
+</script>
+
+</body>
+</html>
+
